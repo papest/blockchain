@@ -1,16 +1,21 @@
-package bclockchain;
+package blockchain;
 
-import java.security.MessageDigest;
-import java.util.*;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 
-public class Blockchain {
+class Blockchain implements Serializable {
     ArrayList<Block> blockchain = new ArrayList<>();
 
     public Blockchain() {
-        blockchain.add(new Block());
     }
 
     public Blockchain generateBlock() {
+        if (blockchain.isEmpty()) {
+            blockchain.add(new Block());
+            return this;
+        }
         blockchain.add(new Block(blockchain.get(blockchain.size() - 1)));
         return this;
     }
@@ -31,41 +36,28 @@ public class Blockchain {
 
     @Override
     public String toString() {
-        return Arrays.toString(blockchain.toArray(new Block[0])).replaceAll("\\[|]", "")
+        return Arrays.toString(blockchain.toArray(new Block[0])).replaceAll("[\\[\\]]", "")
                 .replaceAll(", ", "\n");
     }
 }
 
-class StringUtil {
-    /* Applies Sha256 to a string and returns a hash. */
-    public static String applySha256(String input) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            /* Applies sha256 to our input */
-            byte[] hash = digest.digest(input.getBytes("UTF-8"));
-            StringBuilder hexString = new StringBuilder();
-            for (byte elem : hash) {
-                String hex = Integer.toHexString(0xff & elem);
-                if (hex.length() == 1) hexString.append('0');
-                hexString.append(hex);
-            }
-            return hexString.toString();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-}
 
-class Block {
+
+
+class Block implements Serializable{
     final int id;
     final long timeStamp = new Date().getTime();
-    final String hashPreviousBlock;
-    final String hash;
+    String hashPreviousBlock;
+    String hash;
 
     protected Block() {
         id = 1;
         hashPreviousBlock = "0";
-        hash = StringUtil.applySha256(String.valueOf(id) + timeStamp + hashPreviousBlock);
+        hash = hash();
+    }
+
+    private String hash() {
+        return StringUtil.applySha256(String.valueOf(id) + timeStamp + hashPreviousBlock);
     }
 
     protected Block(Block previous) {
