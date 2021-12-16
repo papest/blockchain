@@ -42,9 +42,7 @@ class Blockchain implements Serializable {
 }
 
 
-
-
-class Block implements Serializable{
+class Block implements Serializable {
     final int id;
     final long timeStamp = new Date().getTime();
     String hashPreviousBlock;
@@ -56,14 +54,14 @@ class Block implements Serializable{
         hash = hash();
     }
 
-    private String hash() {
+    String hash() {
         return StringUtil.applySha256(String.valueOf(id) + timeStamp + hashPreviousBlock);
     }
 
     protected Block(Block previous) {
         id = previous.id + 1;
         hashPreviousBlock = previous.hash;
-        hash = StringUtil.applySha256(String.valueOf(id) + timeStamp + hashPreviousBlock);
+        hash = hash();
     }
 
     @Override

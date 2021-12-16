@@ -1,10 +1,14 @@
 package blockchain;
 
 import java.util.Date;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class MagicBlockchain extends Blockchain {
-    final private int numberOfNulls;
+    int numberOfNulls;
+
+    public MagicBlockchain() {
+        this.numberOfNulls = 0;
+    }
 
     public MagicBlockchain(int numberOfNulls) {
         this.numberOfNulls = numberOfNulls;
@@ -12,29 +16,30 @@ public class MagicBlockchain extends Blockchain {
 
 
     class MagicBlock extends Block {
-        Random random = new Random();
+
         int magic;
         long createTime;
 
         public MagicBlock(Block previous) {
             super(previous);
-            long start = new Date().toInstant().getEpochSecond();
-            this.hash = hash();
-            this.createTime = new Date().toInstant().getEpochSecond() - start;
+
         }
 
         public MagicBlock() {
             super();
-            long start = new Date().toInstant().getEpochSecond();
-            this.hash = hash();
-            this.createTime = new Date().toInstant().getEpochSecond() - start;
+
+
         }
 
-        private String hash() {
+        @Override
+        String hash() {
+            long start = new Date().toInstant().getEpochSecond();
             while (true) {
-                this.magic = random.nextInt();
+                this.magic = ThreadLocalRandom.current().nextInt();
+
                 String hash = StringUtil.applySha256(String.valueOf(id) + timeStamp + hashPreviousBlock + magic);
                 if (hash.matches("0{" + numberOfNulls + "}.*")) {
+                    this.createTime = new Date().toInstant().getEpochSecond() - start;
                     return hash;
 
                 }
