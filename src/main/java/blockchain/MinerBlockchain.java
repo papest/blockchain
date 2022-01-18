@@ -50,6 +50,7 @@ public class MinerBlockchain extends MagicBlockchain {
             nextNumberOfNulls = nextNumberOfNulls(this);
         }
 
+        @Override
         String hash() {
             long start = new Date().toInstant().getEpochSecond();
             while (true) {
