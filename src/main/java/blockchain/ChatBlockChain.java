@@ -1,12 +1,13 @@
 package blockchain;
 
+import java.io.Serializable;
 import java.security.*;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-public class ChatBlockChain extends MinerBlockchain {
+public class ChatBlockChain extends MinerBlockchain implements Serializable{
     static final AtomicInteger lastMessageNumber = new AtomicInteger(0);
 
     ArrayList<Message> newMessages = new ArrayList<>();
@@ -31,7 +32,7 @@ public class ChatBlockChain extends MinerBlockchain {
         }
     }
 
-    class ChatBlock extends MinersBlock {
+    class ChatBlock extends MinersBlock implements Serializable {
         ArrayList<Message> data;
 
         public ChatBlock() {

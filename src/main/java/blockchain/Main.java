@@ -1,5 +1,6 @@
 package blockchain;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -9,37 +10,51 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Main {
     public static void main(String[] args) {
-        String[] messages = {
-                "Ау!",
-                "Есть кто?",
-                "Пришлите немного денег!",
-                "Скоро Новый Год!",
-                "Да, да..",
-                "Какой-то сумасшедший дом!"
-        };
 
+        VCBlockChain vcBlockChain = null ;
+        try (ObjectInputStream objectInputStream = new ObjectInputStream(
 
-        ChatBlockChain chatBlockChain = new ChatBlockChain();
-        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        List<Miner<ChatBlockChain.ChatBlock>> minersList = new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
-            minersList.add(new Miner<>(chatBlockChain));
+                new FileInputStream(System.getProperty("user.home")+ File.separator + "blockchain.txt"))) {
+            vcBlockChain = (VCBlockChain) objectInputStream.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+
+    }
+        if (vcBlockChain == null) {
+            vcBlockChain = new VCBlockChain();
         }
-        for (int i = 0; i < 5; i++) {
-            minersList.get(ThreadLocalRandom.current().nextInt(4))
-                    .send(messages[ThreadLocalRandom.current().nextInt(messages.length)]);
+int minerCount = 4;
+int blockCount = 1;
+
+        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        List<Miner<VCBlockChain.VCBlock>> minersList = new ArrayList<>();
+        for (int i = 0; i < minerCount; i++) {
+            minersList.add(new Miner<>(vcBlockChain));
+        }
+        for (int i = 0; i < blockCount; i++) {
+           Miner<VCBlockChain.VCBlock> sender = minersList.get(ThreadLocalRandom.current().nextInt(minerCount));
+                    sender.send(new Transaction(ThreadLocalRandom.current().nextInt(vcBlockChain.sumVC(sender)), sender,
+                            minersList.get(ThreadLocalRandom.current().nextInt(minerCount))));
             try {
-                while (!chatBlockChain.accept(executor.invokeAny(minersList))) {
+                while (!vcBlockChain.accept(executor.invokeAny(minersList))) {
                 }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
         }
-        executor.shutdown();
-        System.out.println(chatBlockChain);
+        executor.shutdownNow();
+        System.out.println(vcBlockChain);
 
+//        try(ObjectOutputStream oos = new ObjectOutputStream(
+//                new FileOutputStream(System.getProperty("user.home")+ File.separator + "blockchain.txt"))){
+//
+//            oos.writeObject(vcBlockChain);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        System.out.println(vcBlockChain);
+//
     }
 }
 

@@ -1,11 +1,12 @@
 package blockchain;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class MinerBlockchain extends MagicBlockchain {
-    final int MINIMUM_CREATE_TIME = 9;
-    final int MAXIMUM_CREATE_TIME = 60;
+public class MinerBlockchain extends MagicBlockchain implements Serializable {
+    final int MINIMUM_CREATE_TIME = 3;
+    final int MAXIMUM_CREATE_TIME = 10;
 
     public MinerBlockchain() {
 
@@ -35,10 +36,10 @@ public class MinerBlockchain extends MagicBlockchain {
         return false;
     }
 
-    interface InterfaceBlock {
+    interface InterfaceBlock extends Serializable{
     }
 
-    class MinersBlock extends MagicBlock implements InterfaceBlock {
+    class MinersBlock extends MagicBlock implements InterfaceBlock, Serializable {
         int minerNumber;
         int numberOfNulls = MinerBlockchain.this.numberOfNulls;
         int nextNumberOfNulls;

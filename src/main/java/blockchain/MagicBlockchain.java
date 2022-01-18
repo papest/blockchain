@@ -1,9 +1,10 @@
 package blockchain;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class MagicBlockchain extends Blockchain {
+public class MagicBlockchain extends Blockchain implements Serializable {
     int numberOfNulls;
 
     public MagicBlockchain() {
@@ -15,7 +16,7 @@ public class MagicBlockchain extends Blockchain {
     }
 
 
-    class MagicBlock extends Block {
+    class MagicBlock extends Block implements Serializable{
 
         int magic;
         long createTime;

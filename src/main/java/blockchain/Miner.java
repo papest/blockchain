@@ -12,32 +12,47 @@ import java.util.function.Supplier;
 
 public class Miner<T extends MinersBlock> implements Callable<T>, Serializable {
 
+    final int INITIAL_SUM = 100;
     static int numberOfMiners = 0;
     int number;
+    int wallet = INITIAL_SUM;
     MinerBlockchain minerBlockchain;
     GenerateKeys gk;
 
     {
         try {
             gk = new GenerateKeys(1024);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (NoSuchProviderException e) {
+        } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
             e.printStackTrace();
         }
     }
 
 
-    Map<Class<? extends MinerBlockchain>, Supplier<InterfaceBlock>> firstBlockSupplierMap = Map.of(MinerBlockchain.class,
+    transient Map<Class<? extends MinerBlockchain>, Supplier<InterfaceBlock>> firstBlockSupplierMap = Map.of(MinerBlockchain.class,
             () -> minerBlockchain.new MinersBlock(),
-            ChatBlockChain.class, () -> ((ChatBlockChain) minerBlockchain).new ChatBlock());
-    Map<Class<? extends MinerBlockchain>, java.util.function.UnaryOperator<InterfaceBlock>> secondBlockSupplierMap = Map.of(MinerBlockchain.class,
+            ChatBlockChain.class, () -> ((ChatBlockChain) minerBlockchain).new ChatBlock(),
+            VCBlockChain.class, () -> {
+                VCBlockChain.VCBlock vcBlock = ((VCBlockChain) minerBlockchain).new VCBlock();
+                vcBlock.miner = (Miner<VCBlockChain.VCBlock>) this;
+                return vcBlock;
+    });
+    transient Map<Class<? extends MinerBlockchain>, java.util.function.UnaryOperator<InterfaceBlock>> secondBlockSupplierMap = Map.of(MinerBlockchain.class,
             a -> minerBlockchain.new MinersBlock((Block) a),
-            ChatBlockChain.class, a -> ((ChatBlockChain) minerBlockchain).new ChatBlock((Block) a));
+            ChatBlockChain.class, a -> ((ChatBlockChain) minerBlockchain).new ChatBlock((Block) a),
+            VCBlockChain.class, a -> {
+                VCBlockChain.VCBlock vcBlock = ((VCBlockChain) minerBlockchain).new VCBlock((Block) a);
+                vcBlock.miner = (Miner<VCBlockChain.VCBlock>) this;
+                return vcBlock;
+    });
+
 
     public Miner(MinerBlockchain mBlockchain) {
         number = numberOfMiners++;
         this.minerBlockchain = mBlockchain;
+
+    }
+    public void send (Transaction transaction) {
+        ((VCBlockChain)   minerBlockchain).receive(transaction, this);
 
     }
 

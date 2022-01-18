@@ -1,13 +1,18 @@
 package blockchain;
 
+import java.io.Serializable;
 import java.security.*;
 
-public class GenerateKeys {
+public class GenerateKeys implements Serializable {
 
-    private KeyPairGenerator keyGen;
+    transient private KeyPairGenerator keyGen;
     private KeyPair pair;
     private PrivateKey privateKey;
     private PublicKey publicKey;
+
+    public GenerateKeys() throws NoSuchAlgorithmException, NoSuchProviderException {
+
+    }
 
     public GenerateKeys(int keylength) throws NoSuchAlgorithmException, NoSuchProviderException {
         this.keyGen = KeyPairGenerator.getInstance("RSA");
