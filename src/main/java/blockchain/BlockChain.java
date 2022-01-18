@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 class Blockchain implements Serializable {
     ArrayList<Block> blockchain = new ArrayList<>();
@@ -20,6 +21,7 @@ class Blockchain implements Serializable {
         return this;
     }
 
+
     public boolean isValid() {
         String previousHash = blockchain.get(0).hash;
 
@@ -34,19 +36,21 @@ class Blockchain implements Serializable {
 
     }
 
+
     @Override
     public String toString() {
-        return Arrays.toString(blockchain.toArray(new Block[0])).replaceAll("[\\[\\]]", "")
-                .replaceAll(", ", "\n");
+
+        return blockchain.stream().map(Block::toString).collect(Collectors.joining("\n"));
     }
 }
 
 
-class Block implements Serializable {
-    final int id;
-    final long timeStamp = new Date().getTime();
+class Block implements MinerBlockchain.InterfaceBlock, Serializable {
+    int id;
+    long timeStamp = new Date().getTime();
     String hashPreviousBlock;
     String hash;
+
 
     protected Block() {
         id = 1;
