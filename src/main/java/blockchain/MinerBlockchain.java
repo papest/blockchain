@@ -35,12 +35,15 @@ public class MinerBlockchain extends MagicBlockchain {
         return false;
     }
 
-    class MinersBlock extends MagicBlock {
+    interface InterfaceBlock {
+    }
+
+    class MinersBlock extends MagicBlock implements InterfaceBlock {
         int minerNumber;
         int numberOfNulls = MinerBlockchain.this.numberOfNulls;
         int nextNumberOfNulls;
 
-        MinersBlock() {
+        public MinersBlock() {
             super();
             nextNumberOfNulls = nextNumberOfNulls(this);
         }
@@ -50,7 +53,6 @@ public class MinerBlockchain extends MagicBlockchain {
             nextNumberOfNulls = nextNumberOfNulls(this);
         }
 
-        @Override
         String hash() {
             long start = new Date().toInstant().getEpochSecond();
             while (true) {
