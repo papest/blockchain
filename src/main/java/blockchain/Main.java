@@ -10,15 +10,15 @@ public class Main {
     public static void main(String[] args) {
 
 
-        MinerBlockchain minerBlockchain = new MinerBlockchain();
+        ChatBlockChain chatBlockChain = new ChatBlockChain();
         ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        List<Miner> minersList = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            minersList.add(new Miner(minerBlockchain));
+        List<ChatMiner> minersList = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            minersList.add(new ChatMiner(chatBlockChain));
         }
         for (int i = 0; i < 5; i++) {
             try {
-                while(!minerBlockchain.accept(executor.invokeAny(minersList))){}
+                while(!chatBlockChain.accept(executor.invokeAny(minersList))){}
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (ExecutionException e) {
@@ -26,10 +26,10 @@ public class Main {
             }
         }
         executor.shutdown();
-        System.out.println(minerBlockchain);
+        System.out.println(chatBlockChain);
+
     }
 }
-
 
 
 
